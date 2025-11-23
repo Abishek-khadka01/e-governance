@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model candidates {
+  candidate_name String     @db.VarChar(100)
+  year           Int
+  created_at     DateTime?  @default(now()) @db.Timestamp(6)
+  id             String     @id @db.Uuid
+  user_id        String?    @db.Uuid
+  party_id       String?    @db.Uuid
+  election_id    String?    @db.Uuid
+  elections      elections? @relation(fields: [election_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  parties        parties?   @relation(fields: [party_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users          users?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  votes          votes[]
+}
+
+model elections {
+  election_name String       @db.VarChar(100)
+  election_type String       @db.VarChar(50)
+  year          Int
+  start_date    DateTime     @db.Date
+  end_date      DateTime     @db.Date
+  created_at    DateTime?    @default(now()) @db.Timestamp(6)
+  id            String       @id @db.Uuid
+  candidates    candidates[]
+  votes         votes[]
+}
+
+model parties {
+  party_name      String            @unique @db.VarChar(100)
+  abbreviation    String?           @unique @db.VarChar(20)
+  leader_name     String            @db.VarChar(100)
+  is_verified     Boolean?          @default(false)
+  created_at      DateTime?         @default(now()) @db.Timestamp(6)
+  id              String            @id @db.Uuid
+  registered_by   String?           @db.Uuid
+  candidates      candidates[]
+  users           users?            @relation(fields: [registered_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  party_documents party_documents[]
+}
+
+model party_document_urls {
+  url               String
+  id                String           @id @db.Uuid
+  party_document_id String?          @db.Uuid
+  party_documents   party_documents? @relation(fields: [party_document_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model party_documents {
+  document_type       String                @db.VarChar(50)
+  status              doc_status_enum?      @default(pending)
+  uploaded_at         DateTime?             @default(now()) @db.Timestamp(6)
+  id                  String                @id @db.Uuid
+  party_id            String?               @db.Uuid
+  uploaded_by         String?               @db.Uuid
+  party_document_urls party_document_urls[]
+  parties             parties?              @relation(fields: [party_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users               users?                @relation(fields: [uploaded_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model user_documents {
+  document_type                           String           @db.VarChar(50)
+  document_url                            String
+  status                                  doc_status_enum? @default(pending)
+  uploaded_at                             DateTime?        @default(now()) @db.Timestamp(6)
+  id                                      String           @id @db.Uuid
+  user_id                                 String?          @db.Uuid
+  verified_by                             String?          @db.Uuid
+  users_user_documents_user_idTousers     users?           @relation("user_documents_user_idTousers", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users_user_documents_verified_byTousers users?           @relation("user_documents_verified_byTousers", fields: [verified_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model users {
+  username                                         String            @unique @db.VarChar(50)
+  phone_number                                     String            @unique @db.VarChar(15)
+  email                                            String?           @unique @db.VarChar(100)
+  password_hash                                    String
+  user_type                                        user_type_enum?   @default(voter)
+  is_verified                                      Boolean?          @default(false)
+  created_at                                       DateTime?         @default(now()) @db.Timestamp(6)
+  citizenship_no                                   String?           @unique @db.VarChar(20)
+  id                                               String            @id @db.Uuid
+  candidates                                       candidates[]
+  parties                                          parties[]
+  party_documents                                  party_documents[]
+  user_documents_user_documents_user_idTousers     user_documents[]  @relation("user_documents_user_idTousers")
+  user_documents_user_documents_verified_byTousers user_documents[]  @relation("user_documents_verified_byTousers")
+  votes                                            votes[]
+}
+
+model votes {
+  voted_at     DateTime?   @default(now()) @db.Timestamp(6)
+  id           String      @id @db.Uuid
+  voter_id     String?     @db.Uuid
+  candidate_id String?     @db.Uuid
+  election_id  String?     @db.Uuid
+  candidates   candidates? @relation(fields: [candidate_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  elections    elections?  @relation(fields: [election_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users        users?      @relation(fields: [voter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum doc_status_enum {
+  pending
+  approved
+  rejected
+}
+
+enum user_type_enum {
+  voter
+  admin
+}

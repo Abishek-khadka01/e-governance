@@ -1,0 +1,90 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.candidates (
+  candidate_name character varying NOT NULL,
+  year integer NOT NULL,
+  created_at timestamp without time zone DEFAULT now(),
+  id uuid NOT NULL,
+  user_id uuid,
+  party_id uuid,
+  election_id uuid,
+  CONSTRAINT candidates_pkey PRIMARY KEY (id),
+  CONSTRAINT candidates_election_id_fkey FOREIGN KEY (election_id) REFERENCES public.elections(id),
+  CONSTRAINT candidates_party_id_fkey FOREIGN KEY (party_id) REFERENCES public.parties(id),
+  CONSTRAINT candidates_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.elections (
+  election_name character varying NOT NULL,
+  election_type character varying NOT NULL,
+  year integer NOT NULL,
+  start_date date NOT NULL,
+  end_date date NOT NULL,
+  created_at timestamp without time zone DEFAULT now(),
+  id uuid NOT NULL,
+  CONSTRAINT elections_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.parties (
+  party_name character varying NOT NULL UNIQUE,
+  abbreviation character varying UNIQUE,
+  leader_name character varying NOT NULL,
+  is_verified boolean DEFAULT false,
+  created_at timestamp without time zone DEFAULT now(),
+  id uuid NOT NULL,
+  registered_by uuid,
+  CONSTRAINT parties_pkey PRIMARY KEY (id),
+  CONSTRAINT parties_registered_by_fkey FOREIGN KEY (registered_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.party_document_urls (
+  url text NOT NULL,
+  id uuid NOT NULL,
+  party_document_id uuid,
+  CONSTRAINT party_document_urls_pkey PRIMARY KEY (id),
+  CONSTRAINT party_document_urls_party_document_id_fkey FOREIGN KEY (party_document_id) REFERENCES public.party_documents(id)
+);
+CREATE TABLE public.party_documents (
+  document_type character varying NOT NULL,
+  status USER-DEFINED DEFAULT 'pending'::doc_status_enum,
+  uploaded_at timestamp without time zone DEFAULT now(),
+  id uuid NOT NULL,
+  party_id uuid,
+  uploaded_by uuid,
+  CONSTRAINT party_documents_pkey PRIMARY KEY (id),
+  CONSTRAINT party_documents_party_id_fkey FOREIGN KEY (party_id) REFERENCES public.parties(id),
+  CONSTRAINT party_documents_uploaded_by_fkey FOREIGN KEY (uploaded_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.user_documents (
+  document_type character varying NOT NULL,
+  document_url text NOT NULL,
+  status USER-DEFINED DEFAULT 'pending'::doc_status_enum,
+  uploaded_at timestamp without time zone DEFAULT now(),
+  id uuid NOT NULL,
+  user_id uuid,
+  verified_by uuid,
+  CONSTRAINT user_documents_pkey PRIMARY KEY (id),
+  CONSTRAINT user_documents_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+  CONSTRAINT user_documents_verified_by_fkey FOREIGN KEY (verified_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.users (
+  username character varying NOT NULL UNIQUE,
+  phone_number character varying NOT NULL UNIQUE,
+  email character varying UNIQUE,
+  password_hash text NOT NULL,
+  user_type USER-DEFINED DEFAULT 'voter'::user_type_enum,
+  is_verified boolean DEFAULT false,
+  created_at timestamp without time zone DEFAULT now(),
+  citizenship_no character varying,
+  id uuid NOT NULL,
+  CONSTRAINT users_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.votes (
+  voted_at timestamp without time zone DEFAULT now(),
+  id uuid NOT NULL,
+  voter_id uuid,
+  candidate_id uuid,
+  election_id uuid,
+  CONSTRAINT votes_pkey PRIMARY KEY (id),
+  CONSTRAINT votes_candidate_id_fkey FOREIGN KEY (candidate_id) REFERENCES public.candidates(id),
+  CONSTRAINT votes_election_id_fkey FOREIGN KEY (election_id) REFERENCES public.elections(id),
+  CONSTRAINT votes_voter_id_fkey FOREIGN KEY (voter_id) REFERENCES public.users(id)
+);

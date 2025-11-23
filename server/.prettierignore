@@ -1,0 +1,43 @@
+# Prettier ignore patterns (same syntax as .gitignore)
+
+# Node modules and build artifacts
+node_modules/
+dist/
+build/
+out/
+coverage/
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.serverless/
+.vercel/
+public/
+
+# Lockfiles and package artifacts
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+
+# Generated / binary / media files
+*.min.js
+*.map
+*.log
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+*.exe
+*.dll
+*.wasm
+
+# Generated types / bundles
+*.d.ts
+*.bundle.js
