@@ -11,8 +11,10 @@ const AdminLogin: React.FC = () => {
     const setUser = useUserStore((state)=>state.setUser);
     const navigate = useNavigate();
     const loginFunction =  async(request : UserLoginRequest) =>{
-      console.log(import.meta.env.BASE_URL)
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}${LOGIN}`, request );
+    console.log(import.meta.env.BASE_URL)
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}${LOGIN}`, request, {
+          withCredentials :true
+        } );
         console.log(response)
         return response.data;
     }

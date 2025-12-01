@@ -20,7 +20,9 @@ export const UserPage = () => {
       }
     }
 
-    fetchUsers()
+    const response = fetchUsers()
+    console.log(`The result obtained from the fetchusers is ${response}`)
+    
   }, [])
 
   const onAssignAdmin = async (id: string) => {

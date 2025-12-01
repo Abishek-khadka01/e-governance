@@ -8,40 +8,48 @@ interface UserCardProps {
 
 export const UserCard: React.FC<UserCardProps> = ({ user, onAssignAdmin, onVerifyUser }) => {
   return (
+    <div className="w-80 rounded-xl border border-gray-200 bg-white p-6 shadow-md hover:shadow-lg transition-shadow">
+      
+      {/* Username */}
+      <h2 className="text-xl font-semibold text-gray-800 mb-4">
+        {user.username}
+      </h2>
 
-    <div className="border border-gray-300 rounded-lg p-6 mb-4 w-80 shadow-sm">
-      <div className="mb-2"><strong>ID:</strong> {user.id}</div>
-      <div className="mb-2"><strong>Username:</strong> {user.username}</div>
-      <div className="mb-2"><strong>Phone:</strong> {user.phone_number}</div>
-      <div className="mb-2"><strong>Email:</strong> {user.email || "N/A"}</div>
-      <div className="mb-2">
-        <strong>Created At:</strong> {user.created_at ? new Date(user.created_at).toLocaleString() : "N/A"}
+      <div className="space-y-2 text-gray-700 text-sm">
+        <p><strong>Phone:</strong> {user.phone_number}</p>
+        <p><strong>Email:</strong> {user.email || "N/A"}</p>
+        <p><strong>User Type:</strong> {user.user_type || "N/A"}</p>
+        <p><strong>Verified:</strong> {user.is_verified ? "Yes" : "No"}</p>
+        <p><strong>Citizenship No:</strong> {user.citizenship_no || "N/A"}</p>
+        <p>
+          <strong>Created At:</strong>{" "}
+          {user.created_at ? new Date(user.created_at).toLocaleString() : "N/A"}
+        </p>
       </div>
-      <div className="mb-2"><strong>User Type:</strong> {user.user_type || "N/A"}</div>
-      <div className="mb-2"><strong>Verified:</strong> {user.is_verified ? "Yes" : "No"}</div>
-      <div className="mb-4"><strong>Citizenship No:</strong> {user.citizenship_no || "N/A"}</div>
 
-      <div className="flex gap-2">
-        <button
-          onClick={() => onAssignAdmin(user.id)}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-        >
-          Assign Admin
-        </button>
+      {/* Buttons */}
+      <div className="mt-4 flex flex-wrap gap-2">
+        
+        {/* Show Assign Admin ONLY if not already admin */}
+        {user.user_type !== "admin" && (
+          <button
+            onClick={() => onAssignAdmin(user.id)}
+            className="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+          >
+            Assign Admin
+          </button>
+        )}
 
+        {/* Show Verify User ONLY if not verified */}
         {!user.is_verified && (
           <button
             onClick={() => onVerifyUser(user.id)}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+            className="flex-1 bg-green-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
           >
             Verify User
           </button>
         )}
       </div>
     </div>
-
-    
   );
 };
-
-
