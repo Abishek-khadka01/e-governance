@@ -5,8 +5,8 @@ import { AppMiddleware } from "../../middlewares/app.middleware";
 const CandidateRouter = Router();
 CandidateRouter.use(AppMiddleware)
 CandidateRouter.post('/register', CandidateController.RegisterCandidate);
-CandidateRouter.get('/:party_id', CandidateController.GetCandidatesByParty);
-CandidateRouter.get('/year', CandidateController.GetCandidateByYear);
 
+CandidateRouter.get('/year', CandidateController.GetCandidateByYear);
+CandidateRouter.get('/:party_id', CandidateController.GetCandidatesByParty);
 export {CandidateRouter}
 

@@ -56,10 +56,14 @@ export class CandidateController {
   static async GetCandidatesByParty(req: Request, res: Response) {
     try {
       const { party_id } = req.params;
+
+      if(!party_id){
+        return Result.CreateError(new Error(`No party_id is received`), 'No party_id is received', 400)(res);
+      }
       const candidatesList = await CandidateService.FindCandidateByParty(party_id as string );
-      return Result.CreateSuccess(candidatesList);
+      return Result.CreateSuccess(candidatesList)(res);
     } catch (error) {
-      return Result.CreateError(error as Error, "Failed to fetch candidates by party");
+      return Result.CreateError(error as Error, "Failed to fetch candidates by party")(res);
     }
   }
 
@@ -76,7 +80,7 @@ export class CandidateController {
   static async GetCandidateByYear (req : Request , res : Response ) {
       try {
 
-        AppLogger.log(`Get Candidate by year is running`);
+        AppLogger.info(`Get Candidate by year is running`);
           const {year} = req.query;
           if(!year){
             AppLogger.log(`NO year was given in the query`);

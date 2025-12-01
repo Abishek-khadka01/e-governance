@@ -19,7 +19,9 @@ export class CandidateService {
                 year : parseInt(year)
               }, 
               include :{
-                users : true
+                users : true,
+                elections : true,
+                parties : true
               }
             })
           }
@@ -75,11 +77,8 @@ export class CandidateService {
               where :{
                 party_id : party
               }, include :{
-                users : {
-                  select :{
-                    password_hash : false
-                  }
-                },parties : true
+                users : true, 
+                parties : true
               }, 
             })
       }
