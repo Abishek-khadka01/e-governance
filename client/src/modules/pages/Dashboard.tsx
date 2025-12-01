@@ -1,63 +1,61 @@
 import { useEffect, useState } from "react";
 import { useUserStore } from "../../stores/userStore";
 import { useNavigate } from "react-router-dom";
-import type { ElectionType, Parties } from "../components/types";
-import axios from 'axios'
+import type { ElectionType, Parties} from "../components/types";
+import axios from "axios";
 import { ELECTIONS, PARTIES } from "../../apis/endpoints";
+
 export default function Dashboard() {
   const user = useUserStore((state) => state.user);
-  console.log(user);
-
-  // Show form
-  const [showForm, setShowForm] = useState(false);
-  const [parties , setParties] = useState<Parties[]>([])
-  const [elections, setElections] = useState<ElectionType[]>([]);
-  const getParties = async ()=>{
-    const response = await axios.get(`${import.meta.env.VITE_API_URL}${PARTIES}`, {
-      withCredentials: true
-    })
-
-    setParties(response.data.data);
-  };
-
-  const getElections= async ()=>{
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}${ELECTIONS}`, {
-        withCredentials : true
-      })
-
-      setElections(response.data.data)
-  }
-
-
-  useEffect(()=>{
-    getElections();
-    getParties();
-  },[])
-  
-  
   const navigate = useNavigate();
-  // Form Data
+
+  const [showForm, setShowForm] = useState(false);
+  const [parties, setParties] = useState<Parties[]>([]);
+  const [elections, setElections] = useState<ElectionType[]>([]);
+
   const [formData, setFormData] = useState({
-    candidate_name: "",
+    candidate_name: user?.username || "",
     party_id: "",
     election_id: "",
   });
 
+  // Fetch Parties
+  const getParties = async () => {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}${PARTIES}`, {
+      withCredentials: true,
+    });
+    setParties(response.data.data);
+  };
+
+  // Fetch Elections
+  const getElections = async () => {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}${ELECTIONS}`, {
+      withCredentials: true,
+    });
+    console.table(response.data.data)
+    setElections(response.data.data);
+  };
+
+  useEffect(() => {
+    getParties();
+    getElections();
+  }, []);
+
   // Handle input change
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-  // Handle Submit
-  const handleSubmit = async (e: any) => {
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const payload = {
       ...formData,
-      user_id: user ? user.id : null, // works even when no user
+      user_id: user ? user.id : null,
     };
 
     try {
@@ -70,11 +68,20 @@ export default function Dashboard() {
       const data = await res.json();
       alert(data.message || "Candidate Registered Successfully!");
       setShowForm(false);
+      setFormData({ candidate_name: user?.username || "", party_id: "", election_id: "" });
     } catch (err) {
       console.error(err);
       alert("Failed to register candidate.");
     }
   };
+
+  // Filter ongoing elections
+  const today = new Date();
+  const ongoingElections = elections.filter((election) => {
+    const startDate = new Date(election.start_date);
+    const endDate = new Date(election.end_date);
+    return today >= startDate && today <= endDate;
+  });
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 flex justify-center">
@@ -85,14 +92,13 @@ export default function Dashboard() {
 
         {/* Profile Section */}
         <div className="border rounded-lg p-5 bg-gray-50 mb-6">
-          <h2 className="text-xl font-semibold mb-4 text-black" >Profile Information</h2>
+          <h2 className="text-xl font-semibold mb-4 text-black">Profile Information</h2>
 
           {user ? (
             <div className="space-y-3 text-black">
               <p><span className="font-semibold">Username:</span> {user.username}</p>
               <p><span className="font-semibold">Phone:</span> {user.phone_number}</p>
               <p><span className="font-semibold">Citizenship No:</span> {user.citizenship_no || "N/A"}</p>
-
               <div className="flex items-center gap-2 mt-2">
                 <span className="font-semibold">Verification:</span>
                 {user.is_verified ? (
@@ -124,44 +130,50 @@ export default function Dashboard() {
 
             <form className="space-y-5" onSubmit={handleSubmit}>
               
-              {/* Candidate Name */}
-              <div  hidden= {true}className="space-y-1">
-                <label className="block text-gray-700 font-medium">Candidate Name</label>
-                <input
-                  type="text"
-                  name="candidate_name"
-                  className="w-full p-2 border rounded"
-                  value={user?.username}
-                  required
-                />
-              </div>
+              {/* Candidate Name (hidden input) */}
+              <input
+                type="hidden"
+                name="candidate_name"
+                value={user?.username || ""}
+              />
 
-              {/* Party ID */}
+              {/* Party Selection */}
               <div className="space-y-1">
-                <label className="block text-gray-700 font-medium">Party ID</label>
-                <input
-                  type="text"
+                <label className="block text-gray-700 font-medium">Select Party</label>
+                <select
                   name="party_id"
                   className="w-full p-2 border rounded"
-                  value={formData.party_id} // use the parties to list all the parties along with thier parties 
+                  value={formData.party_id}
                   onChange={handleChange}
                   required
-                />
+                >
+                  <option value="">-- Select a Party --</option>
+                  {parties.map((party) => (
+                    <option key={party.id} value={party.id}>
+                      {party.party_name} ({party.abbreviation})
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              {/* Election ID */}
+              {/* Election Selection */}
               <div className="space-y-1">
-                <label className="block text-gray-700 font-medium">Election ID</label>
-                <input
-                  type="text"
+                <label className="block text-gray-700 font-medium">Select Election</label>
+                <select
                   name="election_id"
                   className="w-full p-2 border rounded"
-                  value={formData.election_id} // similar for elections
+                  value={formData.election_id}
                   onChange={handleChange}
                   required
-                />
+                >
+                  <option value="">-- Select an Ongoing Election --</option>
+                  {ongoingElections.map((election) => (
+                    <option key={election.id} value={election.id}>
+                      {election.election_name} ({election.year})
+                    </option>
+                  ))}
+                </select>
               </div>
-
 
               {/* Submit */}
               <button
@@ -180,13 +192,14 @@ export default function Dashboard() {
 
           <p className="text-gray-600 mb-4">Next major national election is scheduled soon.</p>
 
-          <button className="bg-blue-700 hover:bg-blue-800 text-white py-2 px-5 rounded-lg font-semibold transition"
-            onClick={()=>{
-             if(!user?.is_verified){
-              alert(`The user is not verified so you cannot proceed furthur`)
-             }else {
-              navigate(`/elections`)
-             }
+          <button
+            className="bg-blue-700 hover:bg-blue-800 text-white py-2 px-5 rounded-lg font-semibold transition"
+            onClick={() => {
+              if (!user?.is_verified) {
+                alert(`The user is not verified so you cannot proceed further`);
+              } else {
+                navigate(`/elections`);
+              }
             }}
           >
             View
