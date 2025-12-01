@@ -5,6 +5,7 @@ import Dashboard from "../modules/pages/Dashboard";
 import PartiesPage from "../modules/pages/PartyPage";
 import VotingPageList from "../modules/pages/VotePage";
 import LandingPage from "../modules/pages/LandingPage";
+import ElectionPage from "../modules/pages/Election";
 
 
 export const AppRouter = ()=>{
@@ -17,9 +18,7 @@ export const AppRouter = ()=>{
         <Route path="/dashboard" element={<Dashboard/>}></Route>
         <Route path="/parties" element={<PartiesPage/>}></Route>
         <Route path="/votes" element={<VotingPageList/>}></Route>
-
-
-
+        <Route path="/elections" element={<ElectionPage/>}></Route>
         </Routes>
 
 

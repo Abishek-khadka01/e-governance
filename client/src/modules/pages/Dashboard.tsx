@@ -1,13 +1,41 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUserStore } from "../../stores/userStore";
-
+import { useNavigate } from "react-router-dom";
+import type { ElectionType, Parties } from "../components/types";
+import axios from 'axios'
+import { ELECTIONS, PARTIES } from "../../apis/endpoints";
 export default function Dashboard() {
   const user = useUserStore((state) => state.user);
   console.log(user);
 
   // Show form
   const [showForm, setShowForm] = useState(false);
+  const [parties , setParties] = useState<Parties[]>([])
+  const [elections, setElections] = useState<ElectionType[]>([]);
+  const getParties = async ()=>{
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}${PARTIES}`, {
+      withCredentials: true
+    })
 
+    setParties(response.data.data);
+  };
+
+  const getElections= async ()=>{
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}${ELECTIONS}`, {
+        withCredentials : true
+      })
+
+      setElections(response.data.data)
+  }
+
+
+  useEffect(()=>{
+    getElections();
+    getParties();
+  },[])
+  
+  
+  const navigate = useNavigate();
   // Form Data
   const [formData, setFormData] = useState({
     candidate_name: "",
@@ -97,14 +125,13 @@ export default function Dashboard() {
             <form className="space-y-5" onSubmit={handleSubmit}>
               
               {/* Candidate Name */}
-              <div className="space-y-1">
+              <div  hidden= {true}className="space-y-1">
                 <label className="block text-gray-700 font-medium">Candidate Name</label>
                 <input
                   type="text"
                   name="candidate_name"
                   className="w-full p-2 border rounded"
-                  value={formData.candidate_name}
-                  onChange={handleChange}
+                  value={user?.username}
                   required
                 />
               </div>
@@ -116,7 +143,7 @@ export default function Dashboard() {
                   type="text"
                   name="party_id"
                   className="w-full p-2 border rounded"
-                  value={formData.party_id}
+                  value={formData.party_id} // use the parties to list all the parties along with thier parties 
                   onChange={handleChange}
                   required
                 />
@@ -129,7 +156,7 @@ export default function Dashboard() {
                   type="text"
                   name="election_id"
                   className="w-full p-2 border rounded"
-                  value={formData.election_id}
+                  value={formData.election_id} // similar for elections
                   onChange={handleChange}
                   required
                 />
@@ -153,7 +180,15 @@ export default function Dashboard() {
 
           <p className="text-gray-600 mb-4">Next major national election is scheduled soon.</p>
 
-          <button className="bg-blue-700 hover:bg-blue-800 text-white py-2 px-5 rounded-lg font-semibold transition">
+          <button className="bg-blue-700 hover:bg-blue-800 text-white py-2 px-5 rounded-lg font-semibold transition"
+            onClick={()=>{
+             if(!user?.is_verified){
+              alert(`The user is not verified so you cannot proceed furthur`)
+             }else {
+              navigate(`/elections`)
+             }
+            }}
+          >
             View
           </button>
         </div>

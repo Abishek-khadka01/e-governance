@@ -3,3 +3,4 @@ export const REGISTER = '/auth/register'
 export const LOGIN = '/auth/login'
 export const PARTIES = '/parties'
 export const CANDIDATES ='/candidates'
+export const ELECTIONS = '/elections';
