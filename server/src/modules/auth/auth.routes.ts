@@ -8,7 +8,7 @@ import { AdminMiddleWare } from '../../middlewares/AdminMiddleware';
 
 export const AuthRouter = Router();
 
-AuthRouter.post('/register', upload.array('verification'),   validateMiddleware(userRegisterSchema), AuthController.UserRegister);
+AuthRouter.post('/register', validateMiddleware(userRegisterSchema),upload.array('verification'),  AuthController.UserRegister);
 AuthRouter.post('/login', validateMiddleware(userLoginSchema), AuthController.UserLogin);
 
 //admin 
@@ -17,5 +17,5 @@ AuthRouter.use(AdminMiddleWare);
 
 
 AuthRouter.get('/all',  AuthController.GetAllUsers)
-AuthRouter.put('/create-admin/{user_id}', AuthController.CreateAdmin);
-AuthRouter.put('/verify-user/{user_id}', AuthController.VerifyUser);
+AuthRouter.put('/create-admin/:user_id', AuthController.CreateAdmin);
+AuthRouter.put('/verify-user/:user_id', AuthController.VerifyUser);

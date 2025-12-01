@@ -67,19 +67,20 @@ export class PartyController {
   static async VerifyParty(req : Request , res : Response )  {
       // Admin task 
       try {
+        AppLogger.info(`The Party verification endpoint is running`);
         const {id} = req.params;
-
+          console.log(`The party id is ${id}`);
         if(!id) {
-          return Result.CreateError(new Error(`NO id was found`), 'No id was found')
+          return Result.CreateError(new Error(`NO id was found`), 'No id was found')(res);
         }
 
         await PartyService.update(id, {
           is_verified : true
         })
 
-        return Result.CreateSuccess('Party Verified Successfully')
+        return Result.CreateSuccess('Party Verified Successfully')(res);
       } catch (error) {
-      return Result.CreateError(error as Error, 'Internal Server Error')      
+      return Result.CreateError(error as Error, 'Internal Server Error')(res);      
       }
 
   }

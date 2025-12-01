@@ -4,7 +4,7 @@ import AppLogger from '../utils/logger';
 
 export const validateMiddleware =
   (schema: Joi.ObjectSchema) => (req: Request, res: Response, next: NextFunction) => {
-    console.table(req.body)
+    console.table(req.body);
     AppLogger.info(`Validator is running`);
     const { error } = schema.validate(req.body, { abortEarly: false });
 
@@ -12,9 +12,8 @@ export const validateMiddleware =
       AppLogger.error(`Error in the validation middleware ${error}`)
       return res.status(400).json({
         message: 'Validation error',
-        errors: error.details.map((d) => d.message),
+        errors: error.details.map((d :any ) => d.message),
       });
     }
-
     next();
   };

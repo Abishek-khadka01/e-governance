@@ -13,6 +13,16 @@ export class CandidateService {
         
     */
 
+          static async FindCandidateByYear (year : string) {
+            return await prisma.candidates.findMany({
+              where :{
+                year : parseInt(year)
+              }, 
+              include :{
+                users : true
+              }
+            })
+          }
     static async FindCandidates() : Promise<candidates[] | null> {
         return await prisma.candidates.findMany({
           include :{

@@ -57,12 +57,20 @@ export class ElectionService {
         }
 
         static async GetPresentElections () : Promise<elections[] | null> {
-          const date = new Date();
+          const date = new Date().getFullYear();
           return await  prisma.elections.findMany({
             where :{
               year : Number(date)
             }
           })
+        }
+
+        static async GetAllElectionYear() {
+            return await prisma.elections.findMany({
+              select:{
+                year : true
+              }
+            })
         }
 }
 

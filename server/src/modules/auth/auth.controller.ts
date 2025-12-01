@@ -114,7 +114,7 @@ export class AuthController {
           return Result.CreateError(new Error('NO users found'), 'NO users found')(res);
         }
 
-        return Result.CreateSuccess<UserLoginResponse[]>(response);
+        return Result.CreateSuccess<UserLoginResponse[]>(response)(res);
 
       } catch (error) {
         return Result.CreateError(error as Error, 'Internal Server Error')(res);

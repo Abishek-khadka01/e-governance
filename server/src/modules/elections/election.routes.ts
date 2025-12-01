@@ -11,13 +11,13 @@ export const ElectionRouter = Router();
 ElectionRouter.use(AppMiddleware);
 
 
-ElectionRouter.post('/register', validateMiddleware(electionCreateSchema), ElectionController.CreateElection)
+
 
 ElectionRouter.get('/', ElectionController.GetElections);
-
+ElectionRouter.get('/years', ElectionController.GetAllElectionsYear);
 
 ElectionRouter.use(AdminMiddleWare)
-
+ElectionRouter.post('/register', validateMiddleware(electionCreateSchema), ElectionController.CreateElection)
 ElectionRouter.put('/update', validateMiddleware(electionUpdateSchema), ElectionController.UpdateDate)
 
 

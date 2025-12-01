@@ -4,10 +4,10 @@ import type { ElectionCreateRequest, ElectionUpdateRequest } from "./election.ty
 import { ElectionService } from "./election.service";
 import type { elections } from "../../generated/prisma/client";
 import { v4 } from "uuid";
+import AppLogger from "../../utils/logger";
 
 export class ElectionController {
 
-    private static readonly electionService = ElectionService;
   static async CreateElection(req: Request, res: Response) {
     try {
         
@@ -29,7 +29,7 @@ export class ElectionController {
         return Result.CreateError(
           new Error("End date must be greater than start date"),
           "Invalid Date Range"
-        );
+        )(res);
       }
 
 
@@ -42,7 +42,7 @@ export class ElectionController {
         return Result.CreateError(
           new Error("Election portal is already created"),
           "Election Exists"
-        );
+        )(res);
       }
 
     
@@ -56,20 +56,20 @@ export class ElectionController {
       }
       );
 
-      return Result.CreateSuccess<elections>(election);
+      return Result.CreateSuccess<elections>(election)(res);
     } catch (error) {
-      return Result.CreateError(error as Error, "Internal Server Error");
+      return Result.CreateError(error as Error, "Internal Server Error")(res);
     }
   }
 
     static async GetElections(req : Request , res: Response ) {
         try {
-            const elections = this.electionService.GetPresentElections();
-            return Result.CreateSuccess(elections)
+            const elections = await ElectionService.GetPresentElections();
+            return Result.CreateSuccess(elections)(res);
                     
 
         } catch (error) {
-            return Result.CreateError(error as Error, 'Internal Server Error')
+            return Result.CreateError(error as Error, 'Internal Server Error')(res);
         }
     }
 
@@ -88,13 +88,30 @@ export class ElectionController {
         );
       }
 
-      await this.electionService.update(request.id , {
+      await ElectionService.update(request.id , {
         start_date : request.startDate,
         end_date : request.endDate
       })
-      return Result.CreateSuccess('Election Dates Updated Successfully')
+      return Result.CreateSuccess('Election Dates Updated Successfully')(res);
         } catch (error) {
-            return Result.CreateError(error as Error, 'Internal Server Error')
+            return Result.CreateError(error as Error, 'Internal Server Error')(res);
+        }
+    }
+
+    static async GetAllElectionsYear (req : Request, res :Response) {
+        try {
+          
+          const response = await ElectionService.GetAllElectionYear();
+
+          if(!response){
+            AppLogger.log(`NO elections has been created yet`);
+            return Result.CreateError(new Error(`No elections exist`), 'No elections exist')(res);
+          }
+
+          return Result.CreateSuccess(response, 200)(res);
+        } catch (error) {
+          AppLogger.error(`Error in finding all the elections year`);
+          return Result.CreateError(error as Error, 'Internal Server Error')(res);
         }
     }
 

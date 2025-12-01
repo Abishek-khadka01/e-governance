@@ -3,6 +3,7 @@ import { Result } from "../../common/Response";
 import { CandidateService } from "./candidate.service";
 import type { candidates } from "../../generated/prisma/client";
 import { v4 } from "uuid";
+import AppLogger from "../../utils/logger";
 
 export class CandidateController {
   /*
@@ -27,18 +28,18 @@ export class CandidateController {
         id : v4()
       });
 
-      return Result.CreateSuccess<candidates>(candidate);
+      return Result.CreateSuccess<candidates>(candidate)(res);
     } catch (error) {
-      return Result.CreateError(error as Error, "Failed to register candidate");
+      return Result.CreateError(error as Error, "Failed to register candidate")(res);
     }
   }
 
   static async GetAllCandidates(req: Request, res: Response) {
     try {
       const candidatesList = await CandidateService.FindCandidates();
-      return Result.CreateSuccess(candidatesList);
+      return Result.CreateSuccess(candidatesList)(res);
     } catch (error) {
-      return Result.CreateError(error as Error, "Failed to fetch candidates");
+      return Result.CreateError(error as Error, "Failed to fetch candidates")(res);
     }
   }
 
@@ -70,6 +71,28 @@ export class CandidateController {
     } catch (error) {
       return Result.CreateError(error as Error, "Failed to delete candidate");
     }
+  }
+
+  static async GetCandidateByYear (req : Request , res : Response ) {
+      try {
+
+        AppLogger.log(`Get Candidate by year is running`);
+          const {year} = req.query;
+          if(!year){
+            AppLogger.log(`NO year was given in the query`);
+            return Result.CreateError(new Error('No year was found'), 'No year was given')(res);
+          }
+          const response = await CandidateService.FindCandidateByYear(year as string);
+
+          if(!response){
+            return Result.CreateError(new Error('No candidates was found'), 'No candidate was found')(res);
+          }
+
+          return Result.CreateSuccess(response)(res);
+      } catch (error) {
+        AppLogger.error(`Error in getting the candidates by year`);
+        return Result.CreateError(error as Error , 'Internal Server Error')(res);
+      }
   }
 
   static async GetCandidatesGroupedByElection(req: Request, res: Response) {

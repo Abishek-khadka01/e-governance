@@ -15,5 +15,5 @@ PartyRouter.get('/', PartyController.GetAllParties)
 
 // Admin Routes 
 PartyRouter.use(AdminMiddleWare)
-PartyRouter.put('/{id}', PartyController.VerifyParty)
-PartyRouter.delete('/{id}', PartyController.deleteParty )
+PartyRouter.put('/verify-party/:id', PartyController.VerifyParty)
+PartyRouter.delete('/:id', PartyController.deleteParty )
