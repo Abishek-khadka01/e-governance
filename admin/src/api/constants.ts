@@ -10,3 +10,7 @@ export const CREATE_ADMIN = '/auth/create-admin'
 export const GET_ALL_PARTIES = '/parties'
 
 export const VERIFY_PARTY = '/parties/verify-party'
+
+export const CANIDATES = '/candidates'
+
+export const ELECTIONS = '/elections'

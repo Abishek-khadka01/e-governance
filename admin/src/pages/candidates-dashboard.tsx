@@ -1,54 +1,60 @@
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { ELECTIONS, GET_ALL_PARTIES } from "../api/constants";
+import type { Election, Party } from "./types";
 
 const CandidateDashboard: React.FC = () => {
-
   const navigate = useNavigate();
 
-  // Dummy data for elections
-  const dummyElections = [
-    "2015 - 2020",
-    "2020 - 2025",
-    "2025 - 2030",
-  ];
-
-  // Dummy data for parties
-  const dummyParties = [
-    "National Democratic Party",
-    "United People's Front",
-    "Progressive Alliance",
-    "Freedom Party",
-  ];
-``
   const [activeSection, setActiveSection] = useState<"elections" | "parties" | null>(null);
-  const [elections, setElections] = useState<string[]>([]);
-  const [parties, setParties] = useState<string[]>([]);
+  const [elections, setElections] = useState<Election[]>([]);
+  const [parties, setParties] = useState<Party[]>([]);
 
-  // Handle Election Click — load dummy
-  const handleElectionClick = () => {
-    setActiveSection("elections");
-    setElections(dummyElections);
-  };
-
-  // Handle Election Year Navigation
-  const handleElectionYear = async (yearid: string) => {
+  // Fetch elections from API
+  const fetchElections = async () => {
     try {
-      navigate(`/candidates/year?year=${encodeURIComponent(yearid)}`);
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}${ELECTIONS}`, {
+        withCredentials: true,
+      });
+      setElections(response.data.data);
     } catch (error) {
-      console.error("Error handling election year", error);
+      console.error("Failed to fetch elections:", error);
     }
   };
 
-  // Handle Candidates by Party
-  const handleCandidateswithParty = async (partyId: string) => {
-    navigate(`/candidates/${encodeURIComponent(partyId)}`);
+  // Fetch parties from API
+  const fetchParties = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}${GET_ALL_PARTIES}`, {
+        withCredentials: true,
+      });
+      setParties(response.data.data);
+    } catch (error) {
+      console.error("Failed to fetch parties:", error);
+    }
   };
 
-  // Handle Party Click — load dummy
-  const handlePartyClick = () => {
-    setActiveSection("parties");
-    setParties(dummyParties);
+  // Load data on mount
+  useEffect(() => {
+    fetchElections();
+    fetchParties();
+  }, []);
+
+  // Handle Election Click — show section
+  const handleElectionClick = () => setActiveSection("elections");
+
+  // Handle Party Click — show section
+  const handlePartyClick = () => setActiveSection("parties");
+
+  // Navigate to election year
+  const handleElectionYear = (yearId: string) => {
+    navigate(`/candidates/year?year=${encodeURIComponent(yearId)}`);
+  };
+
+  // Navigate to candidates by party
+  const handleCandidatesWithParty = (partyId: string) => {
+    navigate(`/candidates/${encodeURIComponent(partyId)}`);
   };
 
   return (
@@ -57,7 +63,7 @@ const CandidateDashboard: React.FC = () => {
         Candidate Dashboard
       </h1>
 
-      {/* Buttons */}
+      {/* Section Buttons */}
       <div className="flex gap-4 mb-10">
         <button
           onClick={handleElectionClick}
@@ -86,18 +92,18 @@ const CandidateDashboard: React.FC = () => {
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {elections.map((yearRange) => (
+            {elections.map((election) => (
               <div
-                key={yearRange}
+                key={election.id}
                 className="p-6 bg-white rounded-xl border shadow-md hover:shadow-xl transition hover:-translate-y-1"
               >
                 <h3 className="text-lg font-semibold text-gray-800">
-                  {yearRange}
+                  {election.election_name} ({election.year})
                 </h3>
 
                 <button
                   className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-                  onClick={() => handleElectionYear(yearRange)}
+                  onClick={() => handleElectionYear(election.year.toString())}
                 >
                   View →
                 </button>
@@ -117,16 +123,16 @@ const CandidateDashboard: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {parties.map((party) => (
               <div
-                key={party}
+                key={party.id}
                 className="p-6 bg-white rounded-xl border shadow-md hover:shadow-xl transition hover:-translate-y-1"
               >
                 <h3 className="text-lg font-semibold text-gray-800">
-                  {party}
+                  {party.party_name}
                 </h3>
 
                 <button
                   className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-                  onClick={() => handleCandidateswithParty(party)}
+                  onClick={() => handleCandidatesWithParty(party.id)}
                 >
                   View →
                 </button>
