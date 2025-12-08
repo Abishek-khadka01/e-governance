@@ -14,7 +14,6 @@ export class CandidateController {
     - Delete candidate
     - Get candidates grouped by election
   */
-
   static async RegisterCandidate(req: Request, res: Response) {
     try {
       const { candidate_name, user_id, party_id, election_id, year } = req.body;
@@ -56,7 +55,7 @@ export class CandidateController {
   static async GetCandidatesByParty(req: Request, res: Response) {
     try {
       const { party_id } = req.params;
-
+        console.log(`The party id is ${party_id}`);
       if(!party_id){
         return Result.CreateError(new Error(`No party_id is received`), 'No party_id is received', 400)(res);
       }
@@ -82,6 +81,7 @@ export class CandidateController {
 
         AppLogger.info(`Get Candidate by year is running`);
           const {year} = req.query;
+          console.log(`The year to get candidate by year: ${year}`);
           if(!year){
             AppLogger.log(`NO year was given in the query`);
             return Result.CreateError(new Error('No year was found'), 'No year was given')(res);
@@ -98,10 +98,31 @@ export class CandidateController {
         return Result.CreateError(error as Error , 'Internal Server Error')(res);
       }
   }
+  static async GetCandidateByElection (req : Request , res : Response ) {
+    
+      try{
+        AppLogger.info(`Get Candidate by election is running`);
+          const {election_id} = req.params;
+
+          if(!election_id){
+            AppLogger.warn(`No election id is given in the query`);
+            return Result.CreateError(new Error('No election id is provided '), 'Validation problem', 400)(res);
+          }
+
+        const response = await CandidateService.FindCandidatesByElection(election_id);
+
+         return Result.CreateSuccess(response)(res);
+      }
+    catch (error : any ) {
+        AppLogger.info(`Error in the function  Candidate by election: ${error}`);
+        return Result.CreateError(error as Error  , 'Internal Server Error' )(res);
+    }
+    
+  }
 
   static async GetCandidatesGroupedByElection(req: Request, res: Response) {
     try {
-      const grouped = await CandidateService.FindCandidatesByElection();
+      const grouped = await CandidateService.GroupCandidatesByElection();
       return Result.CreateSuccess(grouped);
     } catch (error) {
       return Result.CreateError(error as Error, "Failed to group candidates by election");

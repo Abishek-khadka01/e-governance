@@ -55,7 +55,7 @@ export class CandidateService {
         })
     } 
 
-      static async FindCandidatesByElection () {
+      static async GroupCandidatesByElection () {
         return await prisma.candidates.groupBy({
           by :'election_id',
           _count :{
@@ -73,7 +73,7 @@ export class CandidateService {
       }
 
       static async FindCandidateByParty(party : string)  {
-            return await prisma.candidates.findMany( {
+            return await prisma.candidates.findMany({
               where :{
                 party_id : party
               }, include :{
@@ -82,6 +82,19 @@ export class CandidateService {
               }, 
             })
       }
+
+    static async FindCandidatesByElection (electionid : string ) {
+            return await prisma.candidates.findMany({
+              where :{
+                election_id : electionid
+              },
+              include :{
+                users : true,
+                parties : true,
+                elections : true
+              }
+            })
+    }
 
 
       static async CreateCandiate (candiate : Prisma.candidatesUncheckedCreateInput) {

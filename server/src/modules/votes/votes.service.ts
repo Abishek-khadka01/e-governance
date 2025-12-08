@@ -4,23 +4,16 @@ import { VoterRepository } from "./votes.repository";
 import type { votes, elections, candidates } from "../../generated/prisma/client";
 
 export class VoteService {
-  // --------------------------
-  // ✔ FIND ELECTION
-  // --------------------------
+
   static async FindElection(electionId: string): Promise<elections | null> {
     return prisma.elections.findUnique({ where: { id: electionId } });
   }
 
-  // --------------------------
-  // ✔ FIND CANDIDATE
-  // --------------------------
   static async FindCandidate(candidateId: string): Promise<candidates | null> {
     return prisma.candidates.findUnique({ where: { id: candidateId } });
   }
 
-  // --------------------------
-  // ✔ MAIN VOTE FUNCTION USING VOTER REPOSITORY
-  // --------------------------
+
   static async CastVote(
     voterId: string,
     candidateId: string,
@@ -59,9 +52,7 @@ export class VoteService {
     });
   }
 
-  // --------------------------
-  // ✔ GET ELECTION RESULTS
-  // --------------------------
+
   static async GetElectionResults(electionId: string) {
     return prisma.votes.groupBy({
       by: ["candidate_id"],
@@ -70,16 +61,10 @@ export class VoteService {
     });
   }
 
-  // --------------------------
-  // ✔ GET ALL VOTES BY USER
-  // --------------------------
   static async GetVotesByUser(voterId: string) {
     return VoterRepository.getVotesByVoter(voterId);
   }
 
-  // --------------------------
-  // ✔ COUNT USER VOTES
-  // --------------------------
   static async CountVotesByUser(voterId: string) {
     return VoterRepository.countVotesByUser(voterId);
   }

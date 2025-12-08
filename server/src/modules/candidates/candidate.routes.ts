@@ -8,5 +8,6 @@ CandidateRouter.post('/register', CandidateController.RegisterCandidate);
 
 CandidateRouter.get('/year', CandidateController.GetCandidateByYear);
 CandidateRouter.get('/:party_id', CandidateController.GetCandidatesByParty);
+CandidateRouter.get('/election/:election_id', CandidateController.GetCandidateByElection)
 export {CandidateRouter}
 
