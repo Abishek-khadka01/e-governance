@@ -17,7 +17,7 @@ export const AppRouter = ()=>{
         <Route path="/login" element={<LoginPage/>}></Route>
         <Route path="/dashboard" element={<Dashboard/>}></Route>
         <Route path="/parties" element={<PartiesPage/>}></Route>
-        <Route path="/votes" element={<VotingPageList/>}></Route>
+        <Route path="/votes/:electionid" element={<VotingPageList/>}></Route>
         <Route path="/elections" element={<ElectionPage/>}></Route>
         </Routes>
 
