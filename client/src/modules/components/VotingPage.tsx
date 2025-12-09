@@ -91,3 +91,4 @@ const ElectionDetail: React.FC<ElectionDetailProps> = ({ electionData }) => {
 };
 
 export default ElectionDetail;
+``
