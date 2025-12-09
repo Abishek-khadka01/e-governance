@@ -29,16 +29,17 @@ export const UserPage = () => {
     console.log("Assign admin to:", id)
     // Your update logic here
 
-      await axios.put(`${import.meta.env.BASE_URL}${CREATE_ADMIN}/${id}`, {}, {
+      await axios.put(`${import.meta.env.VITE_BASE_URL}${CREATE_ADMIN}/${id}`, {}, {
         withCredentials :true
       })
   }
 
   const onVerifyUser = async (id: string) => {
     console.log("Verify user:", id)
-    await axios.put(`${import.meta.env.BASE_URL}${VERIFY_USER}/${id}`,{}, {
+    await axios.put(`${import.meta.env.VITE_BASE_URL}${VERIFY_USER}/${id}`,{}, {
       withCredentials : true
     }); 
+    alert(`User verified successfully`);
   }
 
   return (
