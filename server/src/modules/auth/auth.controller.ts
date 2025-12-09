@@ -151,6 +151,7 @@ export class AuthController {
 
       //verifying the user first 
       
+      AppLogger.info(`The Verify user endpoint is running `);
        const findDocument = await AuthDocumentService.findByUserID(user_id as string );
 
       //  if(!findDocument){

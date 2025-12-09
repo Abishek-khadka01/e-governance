@@ -1,0 +1,89 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class candidates {
+   candidate_name: varchar(100)
+   year: integer
+   created_at: timestamp
+   user_id: uuid
+   party_id: uuid
+   election_id: uuid
+   id: uuid
+}
+class elections {
+   election_name: varchar(100)
+   election_type: varchar(50)
+   year: integer
+   start_date: date
+   end_date: date
+   created_at: timestamp
+   id: uuid
+}
+class parties {
+   party_name: varchar(100)
+   abbreviation: varchar(20)
+   leader_name: varchar(100)
+   is_verified: boolean
+   created_at: timestamp
+   registered_by: uuid
+   coverphoto: varchar(155)
+   id: uuid
+}
+class party_document_urls {
+   url: text
+   party_document_id: uuid
+   id: uuid
+}
+class party_documents {
+   document_type: varchar(50)
+   status: doc_status_enum
+   uploaded_at: timestamp
+   party_id: uuid
+   uploaded_by: uuid
+   id: uuid
+}
+class user_documents {
+   document_type: varchar(50)
+   document_url: text
+   status: doc_status_enum
+   uploaded_at: timestamp
+   user_id: uuid
+   verified_by: uuid
+   id: uuid
+}
+class users {
+   username: varchar(50)
+   phone_number: varchar(15)
+   email: varchar(100)
+   password_hash: text
+   user_type: user_type_enum
+   is_verified: boolean
+   created_at: timestamp
+   citizenship_no: varchar(20)
+   profilepicture: varchar(155)
+   id: uuid
+}
+class votes {
+   voted_at: timestamp
+   voter_id: uuid
+   candidate_id: uuid
+   election_id: uuid
+   id: uuid
+}
+
+candidates           -[#595959,plain]-^  elections           : "election_id:id"
+candidates           -[#595959,plain]-^  parties             : "party_id:id"
+candidates           -[#595959,plain]-^  users               : "user_id:id"
+parties              -[#595959,plain]-^  users               : "registered_by:id"
+party_document_urls  -[#595959,plain]-^  party_documents     : "party_document_id:id"
+party_documents      -[#595959,plain]-^  parties             : "party_id:id"
+party_documents      -[#595959,plain]-^  users               : "uploaded_by:id"
+user_documents       -[#595959,plain]-^  users               : "verified_by:id"
+user_documents       -[#595959,plain]-^  users               : "user_id:id"
+votes                -[#595959,plain]-^  candidates          : "candidate_id:id"
+votes                -[#595959,plain]-^  elections           : "election_id:id"
+votes                -[#595959,plain]-^  users               : "voter_id:id"
+@enduml
