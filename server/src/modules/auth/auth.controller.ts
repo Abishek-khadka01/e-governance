@@ -55,7 +55,8 @@ export class AuthController {
         await AuthDocumentService.create({
           document_type: request.document_type,
           document_url: uploaded.url,
-          user_id: createdUser.id,
+          user_id: createdUser.id as string ,
+          id : v4()
         });
       }
 

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import type { CandidateWithRelations, ElectionCandidatesResponse } from "../pages/types";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import { VOTES } from "../../apis/endpoints";
 
 interface ElectionDetailProps {
   electionData: ElectionCandidatesResponse;
@@ -8,6 +10,7 @@ interface ElectionDetailProps {
 
 const ElectionDetail: React.FC<ElectionDetailProps> = ({ electionData }) => {
   const navigate = useNavigate();
+    const {electionid} = useParams()
   const [voteSubmitted, setVoteSubmitted] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<string | null>(null);
 
@@ -29,12 +32,32 @@ const ElectionDetail: React.FC<ElectionDetailProps> = ({ electionData }) => {
     partiesMap[partyId].push(candidate);
   });
 
-  const handleVote = (candidateId: string) => {
+  const VoteRegistration  = async (candidateId :string,) =>{
+     try {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}${VOTES}/cast-vote`, {
+       candidate_id : candidateId,
+       election_id  : electionid
+     },{
+       withCredentials : true
+     } )   
+     alert(`The user voted successfully`)
+     } catch (error: any) {
+      if(error.response?.status == 401){
+        alert(`the The user has voted already`);
+        navigate('/dashboard')
+      }
+     }
+   
+  
+  }
+
+  const handleVote = async  (candidateId: string, ) => {
     if (voteSubmitted) return;
     console.log("Vote submitted for candidate:", candidateId);
     setVoteSubmitted(true);
     setSelectedCandidate(candidateId);
-    alert("Vote submitted successfully!");
+    await VoteRegistration(candidateId)
+     
     setTimeout(() => navigate("/dashboard"), 1500);
   };
 

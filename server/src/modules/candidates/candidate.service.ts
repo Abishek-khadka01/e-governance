@@ -41,19 +41,29 @@ export class CandidateService {
     static async FindCandidateById (id : string, year : number ) : Promise<candidates| null> {
      return await prisma.candidates.findFirst({
       where :{
-        user_id : id ,
+        candidate_name  : id ,
         year 
       },
           include :{
-            users  : {
-              select :{
-                password_hash : false
-              }
-            },
+            users  : true,
             parties : true
           }
         })
     } 
+     static async FindCandidateByRealId (id : string ) : Promise<candidates| null> {
+     return await prisma.candidates.findFirst({
+      where :{
+        id   ,
+         
+      },
+          include :{
+            users  : true,
+            parties : true
+          }
+        })
+    } 
+
+    
 
       static async GroupCandidatesByElection () {
         return await prisma.candidates.groupBy({

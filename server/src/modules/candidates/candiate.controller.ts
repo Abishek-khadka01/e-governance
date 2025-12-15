@@ -1,9 +1,10 @@
 import type { Request, Response } from "express";
 import { Result } from "../../common/Response";
 import { CandidateService } from "./candidate.service";
-import type { candidates } from "../../generated/prisma/client";
+import type { candidates, elections } from "../../generated/prisma/client";
 import { v4 } from "uuid";
 import AppLogger from "../../utils/logger";
+import { ElectionService } from "../elections/election.service";
 
 export class CandidateController {
   /*
@@ -16,14 +17,18 @@ export class CandidateController {
   */
   static async RegisterCandidate(req: Request, res: Response) {
     try {
-      const { candidate_name, user_id, party_id, election_id, year } = req.body;
-
+      const { candidate_name, user_id, party_id, election_id} = req.body;
+        console.log(`The register candidate is running `)
+        console.table(req.body)
+        
+      const findElection = await ElectionService.GetElectionById(election_id) as elections;
+      console.table(findElection)
       const candidate = await CandidateService.CreateCandiate({
         candidate_name,
         user_id,
         party_id,
         election_id,
-        year,
+        year : Number(findElection.year),
         id : v4()
       });
 

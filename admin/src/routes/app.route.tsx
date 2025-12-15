@@ -7,6 +7,7 @@ import CandidateDashboard from "../pages/candidates-dashboard";
 import ElectionsPage from "../pages/election-dashboard";
 import CandidateByParty from "../pages/candiate-party";
 import CandidateByElection from "../pages/candidate-election";
+import ElectionResultsPage from "../pages/Results";
 export const AppRoute = () => {
   return (
     <Routes>
@@ -18,6 +19,7 @@ export const AppRoute = () => {
       <Route path="/candidates" element={<CandidateDashboard/>}></Route>
       <Route path="/candidates/:party_id" element={<CandidateByParty/>}> </Route>
       <Route path="/candidates/year" element={<CandidateByElection/>}></Route>
+      <Route path="/results/:electionid" element={<ElectionResultsPage/>}></Route>
     </Routes>
   );
 };

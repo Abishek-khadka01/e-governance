@@ -19,6 +19,7 @@ export class VoteService {
     candidateId: string,
     electionId: string
   ): Promise<votes> {
+    console.log(`The service cast vote is running ${voterId} ${candidateId} ${electionId}`);
     // 1. Check election exists
     const election = await this.FindElection(electionId);
     if (!election) throw new Error("Election not found");
@@ -58,6 +59,7 @@ export class VoteService {
       by: ["candidate_id"],
       where: { election_id: electionId },
       _count: { _all: true },
+      
     });
   }
 
@@ -68,4 +70,18 @@ export class VoteService {
   static async CountVotesByUser(voterId: string) {
     return VoterRepository.countVotesByUser(voterId);
   }
+
+  // static async GetElectionResults(electionId : string) {
+
+  //   return prisma.votes.findMany({
+  //     where :{
+  //       election_id : electionId
+  //     }
+  //     , include :{
+  //       candidates : true,
+  //         users : false
+  //     }
+  //   })
+
+  
 }

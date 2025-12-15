@@ -59,13 +59,14 @@ export default function Dashboard() {
     };
 
     try {
-      const res = await fetch("http://localhost:3000/candidate/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const res = await axios.post("http://localhost:3000/candidates/register", {
+          ...payload
+        
+      }, {
+        withCredentials : true
+      } );
 
-      const data = await res.json();
+      const data = res.data.data;
       alert(data.message || "Candidate Registered Successfully!");
       setShowForm(false);
       setFormData({ candidate_name: user?.username || "", party_id: "", election_id: "" });

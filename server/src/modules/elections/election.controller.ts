@@ -12,7 +12,7 @@ export class ElectionController {
     try {
         
       const request: ElectionCreateRequest = req.body;
-
+      AppLogger.info(`The create election route is running `)
       const numericYear = Number(request.year);
 
       if (isNaN(numericYear) || numericYear < 1900 || numericYear > 3000) {

@@ -7,11 +7,12 @@ import { ELECTIONS } from "../../apis/endpoints";
 const ElectionPage= () => {
     
     const getElectionData = async  () =>{
+        console.log(`Running the getElection data for the election page `);
             const response = await axios.get(`${import.meta.env.VITE_API_URL}${ELECTIONS}`, {
                 withCredentials : true
             });
             
-                console.table(response.data);
+                console.table(response.data.data);
 
                 setElections(response.data.data);
             
